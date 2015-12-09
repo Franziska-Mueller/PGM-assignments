@@ -153,7 +153,7 @@ y2 = c + h;
 if nargin == 1
     line([x1 x1 x2 x2 x1], [y1 y2 y2 y1 y1]);
 else
-    line([x1 x1 x2 x2 x1], [y1 y2 y2 y1 y1], 'Color', varargin{1}, 'LineWidth', 1.5);
+    line([x1 x1 x2 x2 x1], [y1 y2 y2 y1 y1], 'Color', varargin{1}, 'LineWidth', 0.5);
 end
 
 end
