@@ -21,14 +21,14 @@ function tracker()
 
 % Read the video sequence into videoSeq as a cell 
 % NOTE: CHANGE FILETYPE AS APPROPRIATE FOR EACH SEQUENCE (*.png, *.bmp, or *.jpg)
-imgPath = '../assignment04-data/sequence1/'; dCell = dir([imgPath '*.png']);
+imgPath = '../assignment04-data/sequence3/'; dCell = dir([imgPath '*.jpg']);
 disp('Loading image files from the video sequence, please be patient.');
 for d = 1:length(dCell)
     videoSeq{d} = imread([imgPath dCell(d).name]);
 end
 
 % Define a path to save your results images and make sure it exists
-resultsPath = './results2/';
+resultsPath = './results3/';
 if ~isdir(resultsPath)
     mkdir(resultsPath);
 end
@@ -120,7 +120,7 @@ for t=1:T
     % figure to a file in your results directory (UNCOMMENT THE PRINT
     % STATEMENT TO WRITE FIGURES TO AN IMAGE WHICH YOU CAN ENCODE INTO A MOVIE FILE)
     for i = 1:N 
-        %drawBox(xSamples{i, 1}, [0 0 1]);
+        drawBox(xSamples{i, 1}, [0 0 1]);
     end
     drawBox(estimate_t, [0 1 0]);
     %print(gcf, '-dpng', [resultsPath 'f' number_into_string(t,1000) '.png'], '-r100');
@@ -200,8 +200,11 @@ function x_t = motionPredict(x_t1, VIDEO_WIDTH, VIDEO_HEIGHT)
 % the bounding box height or aspect ratio can improve your tracking
 MIN_h = 20; 
 MAX_h = 40; 
-MIN_a = .66;
-MAX_a = 1.75;   
+%MIN_h = 100;
+%MAX_h = 200;
+%MIN_a = .66;
+MIN_a = 0.4;
+MAX_a = min(1.75,VIDEO_WIDTH/MAX_h);   
 
 % TODO: Define your motion prediction model, including F and Q, and apply it
 % to predict a new state x_t given the previous state x_t1.  Remember to
@@ -234,6 +237,9 @@ x_t(5) = min(max(x_t(5), MIN_a), MAX_a);
 w = x_t(5) * x_t(6);
 x_t(1) = min(max(1, x_t(1)), VIDEO_WIDTH - w);
 x_t(2) = min(max(1, x_t(2)), VIDEO_HEIGHT - x_t(6));
+if x_t(1) < 0
+    a = 0;
+end
 end
 
 
