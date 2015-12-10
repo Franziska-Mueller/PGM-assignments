@@ -109,7 +109,12 @@ for t=1:T
     % still must infer a solution from the approximate distribution.  I
     % simply took the estimate as the mean state vector computed from all
     % particles.
-    estimate_t = mean(cell2mat(xSamples(:, 1)));
+    
+    % mean
+    % estimate_t = mean(cell2mat(xSamples(:, 1)));
+    % weighted mean
+    sumWeightsInv = 1/sum(cell2mat(xSamples(:,2)));
+    estimate_t = sumWeightsInv * sum(repmat(cell2mat(xSamples(:,2)),1,6) .* cell2mat(xSamples(:,1)));
     
     % draw the estimated state for time t to the figure and save the
     % figure to a file in your results directory (UNCOMMENT THE PRINT
@@ -203,12 +208,14 @@ MAX_a = 1.75;
 % handle the boundary conditions where the state estimate reaches the 
 % edges of the video sequence.
 
-sigma_xpos = max(10, 0*abs(x_t1(3)));
-sigma_ypos = max(10, 0*abs(x_t1(4)));
-sigma_xvel = 10;
-sigma_yvel = 10;
-sigma_a = 0.3;
-sigma_h = 5;
+
+sigma_xpos = max(1, 0.1*abs(x_t1(3)));
+sigma_ypos = max(1, 0.1*abs(x_t1(4)));
+sigma_xvel = 2.5;
+sigma_yvel = 2.5;
+sigma_a = 1;
+sigma_h = 3;
+
 rho = 0.3;
 covMat = [sigma_xpos^2, rho*sigma_xpos*sigma_ypos, 0, 0, 0, 0; % positions
           rho*sigma_xpos*sigma_ypos, sigma_ypos^2, 0, 0, 0, 0;
