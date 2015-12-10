@@ -109,7 +109,12 @@ for t=1:T
     % still must infer a solution from the approximate distribution.  I
     % simply took the estimate as the mean state vector computed from all
     % particles.
-    estimate_t = mean(cell2mat(xSamples(:, 1)));
+    
+    % mean
+    % estimate_t = mean(cell2mat(xSamples(:, 1)));
+    % weighted mean
+    sumWeightsInv = 1/sum(cell2mat(xSamples(:,2)));
+    estimate_t = sumWeightsInv * sum(repmat(cell2mat(xSamples(:,2)),1,6) .* cell2mat(xSamples(:,1)));
     
     % draw the estimated state for time t to the figure and save the
     % figure to a file in your results directory (UNCOMMENT THE PRINT
@@ -118,7 +123,7 @@ for t=1:T
         drawBox(xSamples{i, 1}, [0 0 1]);
     end
     drawBox(estimate_t, [0 1 0]);
-    print(gcf, '-dpng', [resultsPath 'f' number_into_string(t,1000) '.png'], '-r100');
+    %print(gcf, '-dpng', [resultsPath 'f' number_into_string(t,1000) '.png'], '-r100');
     
     
     % allow the figure to refresh so we can see our results
@@ -207,8 +212,8 @@ sigma_xpos = max(1, 0.1*abs(x_t1(3)));
 sigma_ypos = max(1, 0.1*abs(x_t1(4)));
 sigma_xvel = 2.5;
 sigma_yvel = 2.5;
-sigma_a = 0.3;
-sigma_h = 5;
+sigma_a = 1;
+sigma_h = 3;
 rho = 0.3;
 covMat = [sigma_xpos^2, rho*sigma_xpos*sigma_ypos, 0, 0, 0, 0; % positions
           rho*sigma_xpos*sigma_ypos, sigma_ypos^2, 0, 0, 0, 0;
