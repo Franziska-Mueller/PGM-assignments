@@ -46,7 +46,7 @@ VIDEO_WIDTH = size(videoSeq{1},2);  VIDEO_HEIGHT = size(videoSeq{1},1);
 % tracker, we will do it by hand. A GUI interface allows us to select a 
 % bouding box from the first frame of the sequence.
 display('Initialize the bounding box by cropping the face.');
-[patch bB] = imcrop();
+[patch, bB] = imcrop();
 bB = round(bB);
 
 % Fill the initial state vector with our hand initialization
@@ -205,8 +205,8 @@ MAX_a = 1.75;
 
 sigma_xpos = max(1, 0.1*abs(x_t1(3)));
 sigma_ypos = max(1, 0.1*abs(x_t1(4)));
-sigma_xvel = max(VIDEO_WIDTH/20, 0.3*abs(x_t1(3)));
-sigma_yvel = max(VIDEO_HEIGHT/20, 0.3*abs(x_t1(4)));
+sigma_xvel = 2.5;
+sigma_yvel = 2.5;
 sigma_a = 0.3;
 sigma_h = 5;
 rho = 0.3;
