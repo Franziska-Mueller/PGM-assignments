@@ -203,11 +203,21 @@ MAX_a = 1.75;
 % handle the boundary conditions where the state estimate reaches the 
 % edges of the video sequence.
 
-% Hint: to sample from a 3-dimensional zero-mean gaussian distribution
-%vars = [(VIDEO_WIDTH/20) (VIDEO_HEIGHT/20) 10 10 1 5];
-vars = [5 5 5 5 1 5];
-covMat = diag(vars);
-sample = gsamp(zeros(1,6), covMat, 1);
+sigma_xpos = max(1, 0.1*abs(x_t1(3)));
+sigma_ypos = max(1, 0.1*abs(x_t1(4)));
+sigma_xvel = max(VIDEO_WIDTH/20, 0.3*abs(x_t1(3)));
+sigma_yvel = max(VIDEO_HEIGHT/20, 0.3*abs(x_t1(4)));
+sigma_a = 0.3;
+sigma_h = 5;
+rho = 0.3;
+covMat = [sigma_xpos^2, rho*sigma_xpos*sigma_ypos, 0, 0, 0, 0; % positions
+          rho*sigma_xpos*sigma_ypos, sigma_ypos^2, 0, 0, 0, 0;
+          0, 0, sigma_xvel^2, rho*sigma_xvel*sigma_yvel, 0, 0; % velocity
+          0, 0, rho*sigma_xvel*sigma_yvel, sigma_yvel^2, 0, 0;
+          0, 0, 0, 0, sigma_a^2, 0; % bounding box size
+          0, 0, 0, 0, 0, sigma_h^2;
+        ];
+sample = mvnrnd(zeros(1,6), covMat);
 x_t = x_t1;
 x_t(1:2) = [x_t1(1)+x_t1(3) x_t1(2)+x_t1(4)];
 x_t = x_t + sample;
@@ -222,43 +232,6 @@ if(x_t(5) < MIN_a)
 elseif(x_t(5) > MAX_a)
     x_t(5) = MAX_a;
 end
-if(x_t(1) < 1)
-    x_t(1) = 1;
-elseif(x_t(1) > (VIDEO_WIDTH - x_t(5)*x_t(6)))
-    x_t(1) = VIDEO_WIDTH - x_t(5)*x_t(6);
-end
-if(x_t(2) < 1)
-    x_t(2) = 1;
-elseif(x_t(2) > (VIDEO_HEIGHT - x_t(6)))
-    x_t(2) = VIDEO_HEIGHT - x_t(6);
-end
-end
-
-function x = gsamp(mu, covar, nsamp)
-%GSAMP	Sample from a Gaussian distribution.
-%
-%	Description
-%
-%	X = GSAMP(MU, COVAR, NSAMP) generates a sample of size NSAMP from a
-%	D-dimensional Gaussian distribution. The Gaussian density has mean
-%	vector MU and covariance matrix COVAR, and the matrix X has NSAMP
-%	rows in which each row represents a D-dimensional sample vector.
-%
-%	See also
-%	GAUSS, DEMGAUSS
-%
-
-%	Copyright (c) Ian T Nabney (1996-2001)
-
-d = size(covar, 1);
-
-mu = reshape(mu, 1, d);   % Ensure that mu is a row vector
-
-[evec, eval] = eig(covar);
-
-coeffs = randn(nsamp, d)*sqrt(eval);
-
-x = ones(nsamp, 1)*mu + coeffs*evec';
 end
 
 
