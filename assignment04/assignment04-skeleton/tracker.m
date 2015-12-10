@@ -21,7 +21,7 @@ function tracker()
 
 % Read the video sequence into videoSeq as a cell 
 % NOTE: CHANGE FILETYPE AS APPROPRIATE FOR EACH SEQUENCE (*.png, *.bmp, or *.jpg)
-imgPath = '../assignment04-data/sequence4/'; dCell = dir([imgPath '*.png']);
+imgPath = '../assignment04-data/sequence1/'; dCell = dir([imgPath '*.png']);
 disp('Loading image files from the video sequence, please be patient.');
 for d = 1:length(dCell)
     videoSeq{d} = imread([imgPath dCell(d).name]);
@@ -115,10 +115,10 @@ for t=1:T
     % figure to a file in your results directory (UNCOMMENT THE PRINT
     % STATEMENT TO WRITE FIGURES TO AN IMAGE WHICH YOU CAN ENCODE INTO A MOVIE FILE)
     for i = 1:N 
-        drawBox(xSamples{i, 1}, [0 0 1]);
+        %drawBox(xSamples{i, 1}, [0 0 1]);
     end
     drawBox(estimate_t, [0 1 0]);
-    print(gcf, '-dpng', [resultsPath 'f' number_into_string(t,1000) '.png'], '-r100');
+    %print(gcf, '-dpng', [resultsPath 'f' number_into_string(t,1000) '.png'], '-r100');
     
     
     % allow the figure to refresh so we can see our results
@@ -203,10 +203,10 @@ MAX_a = 1.75;
 % handle the boundary conditions where the state estimate reaches the 
 % edges of the video sequence.
 
-sigma_xpos = max(1, 0.1*abs(x_t1(3)));
-sigma_ypos = max(1, 0.1*abs(x_t1(4)));
-sigma_xvel = 2.5;
-sigma_yvel = 2.5;
+sigma_xpos = max(10, 0*abs(x_t1(3)));
+sigma_ypos = max(10, 0*abs(x_t1(4)));
+sigma_xvel = 10;
+sigma_yvel = 10;
 sigma_a = 0.3;
 sigma_h = 5;
 rho = 0.3;
@@ -222,16 +222,11 @@ x_t = x_t1;
 x_t(1:2) = [x_t1(1)+x_t1(3) x_t1(2)+x_t1(4)];
 x_t = x_t + sample;
 
-if(x_t(6) < MIN_h)
-    x_t(6) = MIN_h;
-elseif(x_t(6) > MAX_h)
-    x_t(6) = MAX_h;
-end
-if(x_t(5) < MIN_a)
-    x_t(5) = MIN_a;
-elseif(x_t(5) > MAX_a)
-    x_t(5) = MAX_a;
-end
+x_t(6) = min(max(x_t(6), MIN_h), MAX_h);
+x_t(5) = min(max(x_t(5), MIN_a), MAX_a);
+w = x_t(5) * x_t(6);
+x_t(1) = min(max(1, x_t(1)), VIDEO_WIDTH - w);
+x_t(2) = min(max(1, x_t(2)), VIDEO_HEIGHT - x_t(6));
 end
 
 
